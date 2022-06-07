@@ -5,5 +5,13 @@ def page_not_found(request, exception):
     return render(request, 'core/404.html', {'path': request.path}, status=404)
 
 
-def csfr_failure(request, reason=''):
+def csrf_failure(request, reason=''):
     return render(request, 'core/403csrf.html')
+
+
+def internal_server_error(request, exception):
+    return render(request, 'core/500.html', status=500)
+
+
+def error_403(request, exception):
+    return render(request, 'core/403.html', status=403)
