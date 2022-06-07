@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %} Посты по подпискам {% endblock %}
+{% block header %} Посты по подпискам {% endblock  %}
+{% block content %}
+  {% include 'includes/switcher.html'%}
+    {% for post in page_obj %}
+      {% include 'includes/card.html' with all_group_posts=True profile=True %}
+    {% endfor %}
+    {% include 'includes/paginator.html'%}
+  {% endblock %}
