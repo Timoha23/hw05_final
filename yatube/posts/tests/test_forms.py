@@ -1,12 +1,18 @@
-from django.test import Client, TestCase
+import shutil
+import tempfile
+
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 
 from ..models import Group, Post, User, Comment
 
 COUNT_POSTS_ADDED = 1
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostCreateFormTest(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -28,6 +34,11 @@ class PostCreateFormTest(TestCase):
             text='Тестовый пост',
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
     def test_create_post(self):
         """Форма создает запись в Post"""
         posts_count = Post.objects.count()
@@ -41,6 +52,7 @@ class PostCreateFormTest(TestCase):
             b'\x02\x00\x01\x00\x00\x02\x02\x0C'
             b'\x0A\x00\x3B'
         )
+
         uploaded = SimpleUploadedFile(
             name='small.gif',
             content=small_gif,
@@ -65,7 +77,9 @@ class PostCreateFormTest(TestCase):
 
         self.assertTrue(Post.objects.filter(author=self.user,
                                             text='Тестовый пост 2',
-                                            group=None).exists())
+                                            group=None,
+                                            image='posts/small.gif',
+                                            ).exists())
 
     def test_edit_post(self):
         """Тест редактирования поста с последующим его измненением в БД"""
@@ -207,3 +221,5 @@ class PostCreateFormTest(TestCase):
         self.assertRedirects(response, reverse('posts:post_detail', kwargs={
             'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertTrue(Comment.objects.filter(author=self.user,
+                                               text='Тестовый комментарий'))

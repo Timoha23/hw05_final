@@ -1,10 +1,13 @@
 from math import ceil
+import shutil
+import tempfile
 
 from django.core.cache import cache
-from django.test import Client, TestCase
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.conf import settings
 
 from ..models import Group, Post, User, Comment, Follow
 
@@ -14,8 +17,10 @@ COUNT_POSTS_SECOND_PAGE = 3
 POST_NUMBER_1 = 0
 PAGE_NUMBER_2 = str(ceil((COUNT_POSTS_FIRST_PAGE
                           + COUNT_POSTS_SECOND_PAGE) / LIMIT_POSTS_FOR_PAGE))
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 
 
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class PostsPagesTests(TestCase):
     def setUp(self):
         super().setUpClass()
@@ -66,6 +71,11 @@ class PostsPagesTests(TestCase):
             text='Тестовый комментарий',
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
+
     def test_views_correct_templates(self):
         """Проверка вью на корректность используемых шаблонов"""
         views_templates_names = {
@@ -82,6 +92,7 @@ class PostsPagesTests(TestCase):
                     'post_id': self.first_post_user_1.id}):
             'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:follow_index'): 'posts/follow.html',
         }
         for view, template in views_templates_names.items():
             with self.subTest(template=template):
@@ -104,7 +115,6 @@ class PostsPagesTests(TestCase):
                          self.first_post_user_1.author.username)
         self.assertEqual(index_text_0, self.first_post_user_1.text)
         self.assertEqual(index_id_0, self.first_post_user_1.id)
-        # image in context
         self.assertEqual(index_image_0, self.first_post_user_1.image)
 
     def test_group_posts_correct_context(self):
@@ -165,12 +175,14 @@ class PostsPagesTests(TestCase):
         post_detail_text = post_object.text
         post_detail_id = post_object.id
         post_detail_image = post_object.image
+        post_detail_comment = post_object.comments
 
         self.assertEqual(post_detail_author,
                          self.first_post_user_1.author.username)
         self.assertEqual(post_detail_text, self.first_post_user_1.text)
         self.assertEqual(post_detail_id, self.first_post_user_1.id)
         self.assertEqual(post_detail_image, self.first_post_user_1.image)
+        self.assertEqual(post_detail_comment, self.first_post_user_1.comments)
 
     def test_post_edit_correct_context(self):
         """Шаблон create_post для вью post_edit

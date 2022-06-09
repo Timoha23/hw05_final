@@ -37,6 +37,7 @@ class PostsURLSandTemplatesTest(TestCase):
             f'/group/{self.group.slug}/': HTTPStatus.OK,
             f'/profile/{self.post.author}/': HTTPStatus.OK,
             f'/posts/{self.post.id}/': HTTPStatus.OK,
+            '/follow/': HTTPStatus.FOUND,
         }
         for urls, status in urls_names.items():
             with self.subTest(urls=urls):
@@ -71,10 +72,15 @@ class PostsURLSandTemplatesTest(TestCase):
         response = self.guest_client.get('/create/', follow=True)
         self.assertRedirects(response, '/auth/login/?next=/create/')
 
-    def test_404_page(self):
-        """Неизвестная страница=404"""
-        response = self.authorized_client_author.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+    def test_follow_for_auth(self):
+        """Страница follow доступна авторизированному"""
+        response = self.authorized_client.get('/follow/')
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+    def test_follow_for_not_auth(self):
+        """Страница follow не доступна неавторизованному"""
+        response = self.guest_client.get('/follow/')
+        self.assertRedirects(response, '/auth/login/?next=/follow/')
 
     # Проверка вызываемых HTML-шаблонов
     def test_urls_uses_correct_templates(self):
@@ -86,6 +92,7 @@ class PostsURLSandTemplatesTest(TestCase):
             f'/posts/{self.post.id}/': 'posts/post_detail.html',
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
             '/create/': 'posts/create_post.html',
+            '/follow/': 'posts/follow.html'
         }
         for address, template in templates_urls_names.items():
             with self.subTest(address=address):

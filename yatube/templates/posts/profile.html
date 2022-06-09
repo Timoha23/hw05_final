@@ -4,7 +4,7 @@
 {% block content%}
   <h3>Всего постов: {{author.posts.count}} </h3>  
   <div class="mb-5">
-    {% if user is False %}
+    {% if author != request.user and request.user.is_authenticated %}
       {% if following %}
         <a
           class="btn btn-lg btn-light"
