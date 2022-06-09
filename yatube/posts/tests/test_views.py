@@ -170,6 +170,7 @@ class PostsPagesTests(TestCase):
             'posts:post_detail', kwargs={'post_id': self.first_post_user_1.id})
         )
         post_object = response.context['post']
+        form_field = response.context.get('form').fields.get('text')
 
         post_detail_author = post_object.author.username
         post_detail_text = post_object.text
@@ -183,6 +184,7 @@ class PostsPagesTests(TestCase):
         self.assertEqual(post_detail_id, self.first_post_user_1.id)
         self.assertEqual(post_detail_image, self.first_post_user_1.image)
         self.assertEqual(post_detail_comment, self.first_post_user_1.comments)
+        self.assertIsInstance(form_field, forms.fields.CharField)
 
     def test_post_edit_correct_context(self):
         """Шаблон create_post для вью post_edit
