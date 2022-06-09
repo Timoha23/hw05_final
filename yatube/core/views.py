@@ -5,12 +5,7 @@ from http import HTTPStatus
 
 def page_not_found(request, exception):
     return render(request, 'core/404.html', {'path': request.path},
-                  status=404)
-
-# def page_not_found(request, exception):
-#     return render(request, 'core/404.html', {'path': request.path},
-#                   HTTPStatus.NOT_FOUND)
-# Сделал так, но pytest не проходит - https://prnt.sc/PFpbD3ZcY3W8
+                  status=HTTPStatus.NOT_FOUND)
 
 
 def csrf_failure(request, reason=''):
@@ -18,8 +13,9 @@ def csrf_failure(request, reason=''):
 
 
 def internal_server_error(request, *args, **argv):
-    return render(request, 'core/500.html', HTTPStatus.INTERNAL_SERVER_ERROR)
+    return render(request, 'core/500.html',
+                  status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 def error_403(request, exception):
-    return render(request, 'core/403.html', HTTPStatus.FORBIDDEN)
+    return render(request, 'core/403.html', status=HTTPStatus.FORBIDDEN)
