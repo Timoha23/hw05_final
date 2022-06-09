@@ -5,7 +5,12 @@ from http import HTTPStatus
 
 def page_not_found(request, exception):
     return render(request, 'core/404.html', {'path': request.path},
-                  HTTPStatus.NOT_FOUND)
+                  status=404)
+
+# def page_not_found(request, exception):
+#     return render(request, 'core/404.html', {'path': request.path},
+#                   HTTPStatus.NOT_FOUND)
+# Сделал так, но pytest не проходит - https://prnt.sc/PFpbD3ZcY3W8
 
 
 def csrf_failure(request, reason=''):
