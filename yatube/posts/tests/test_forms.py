@@ -139,7 +139,7 @@ class PostCreateFormTest(TestCase):
         self.assertEqual(Post.objects.count(), posts_count)
 
     def test_auth_user_but_not_author_cant_change_author_post(self):
-        """Тестируем, что авторизированный пользователь,
+        """Тестируем, что авторизированный пользователь
         не являющийся автором не может редактировать пост автора
         """
         new_post = Post.objects.create(
