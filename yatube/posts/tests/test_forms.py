@@ -222,4 +222,5 @@ class PostCreateFormTest(TestCase):
             'post_id': self.post.id}))
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         self.assertTrue(Comment.objects.filter(author=self.user,
+                                               post=self.post,
                                                text='Тестовый комментарий'))
