@@ -36,7 +36,7 @@ python3 manage.py runserver
 ```
 ## Использованные технологии
 
-• Python 3.9,
+• Python 3.9;
 • Django 2.2.16;
 • Pillow 8.3.1;
 • sorl-thumbnail 12.7.0;
