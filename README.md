@@ -44,5 +44,5 @@ pip install -r requirements.txt
 python3 manage.py runserver
 ```
 
-**Автор бэкенда:**
+**Автор:**
 *Ершов Тимофей Сергеевич*
